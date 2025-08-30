@@ -5,6 +5,8 @@ import { createTools } from './tools.js';
 import { modelMapping } from './utils/models.js';
 import { ChatAnthropic } from '@langchain/anthropic';
 import { SystemMessage } from '@langchain/core/messages';
+import { RunnableWithMessageHistory } from '@langchain/core/runnables';
+import { InMemoryChatMessageHistory } from '@langchain/core/chat_history';
 
 const systemMessage = new SystemMessage(
   ` You are an AI agent on Duck network capable of executing all kinds of transactions and interacting with the Duck blockchain.
@@ -66,8 +68,28 @@ export const createAgent = (
     prompt,
   });
 
-  return new AgentExecutor({
+  const executor = new AgentExecutor({
     agent,
     tools,
   });
+
+  // Wrap executor with per-session message history
+  // Maintain a per-session message history map
+  const histories = new Map<string, InMemoryChatMessageHistory>();
+  const agentWithHistory = new RunnableWithMessageHistory({
+    runnable: executor,
+    getMessageHistory: (sessionId: string) => {
+      let history = histories.get(sessionId);
+      if (!history) {
+        history = new InMemoryChatMessageHistory();
+        histories.set(sessionId, history);
+      }
+      return history;
+    },
+    inputMessagesKey: 'input',
+    historyMessagesKey: 'chat_history',
+    outputMessagesKey: 'output',
+  });
+
+  return agentWithHistory;
 };

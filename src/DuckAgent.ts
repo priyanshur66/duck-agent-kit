@@ -1,4 +1,4 @@
-import { transferTon} from './tools/duck/tonOperations.js ';
+import { transferTon } from './tools/duck/tonOperations.js';
 import { transferErc20, burnErc20 } from './tools/duck/erc20Operations.js';
 import { getTonBalance } from './tools/duck/getTonBalance.js';
 import { getErc20Balance } from './tools/duck/getErc20Balance.js';

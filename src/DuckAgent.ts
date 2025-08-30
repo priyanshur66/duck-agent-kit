@@ -1,4 +1,4 @@
-import { transferTon } from './tools/duck/tonOperations.js';
+import { transferTon} from './tools/duck/tonOperations.js ';
 import { transferErc20, burnErc20 } from './tools/duck/erc20Operations.js';
 import { getTonBalance } from './tools/duck/getTonBalance.js';
 import { getErc20Balance } from './tools/duck/getErc20Balance.js';
@@ -7,6 +7,7 @@ import { initializeClient, setCurrentPrivateKey } from './core/client.js';
 import { createAgent } from './agent.js';
 import { applyFirewall } from './aifirewall/index.js';
 import type { Runnable } from '@langchain/core/runnables';
+import type { BaseChatMessageHistory } from '@langchain/core/chat_history';
 import type { modelMapping } from './utils/models.js';
 
 export interface DuckAgentConfig {
@@ -15,6 +16,10 @@ export interface DuckAgentConfig {
   model: keyof typeof modelMapping;
   openAiApiKey?: string;
   anthropicApiKey?: string;
+  personalityPrompt?: string;
+  memory?: {
+    getMessageHistory?: (sessionId: string) => BaseChatMessageHistory;
+  };
 }
 
 export interface TransferTonParams {
@@ -52,6 +57,7 @@ export class DuckAgent {
   private openAiApiKey?: string;
   private anthropicApiKey?: string;
   private defaultSessionId: string;
+  private getMessageHistory?: (sessionId: string) => BaseChatMessageHistory;
 
   constructor(config: DuckAgentConfig) {
     this.privateKey = config.privateKey;
@@ -59,7 +65,8 @@ export class DuckAgent {
     this.model = config.model;
     this.openAiApiKey = config.openAiApiKey;
     this.anthropicApiKey = config.anthropicApiKey;
-  this.defaultSessionId = `duck-agent-${Math.random().toString(36).slice(2)}-${Date.now()}`;
+    this.getMessageHistory = config.memory?.getMessageHistory;
+    this.defaultSessionId = `duck-agent-${Math.random().toString(36).slice(2)}-${Date.now()}`;
 
     if (!this.privateKey) {
       throw new Error('Private key is required.');
@@ -77,6 +84,10 @@ export class DuckAgent {
       this.model,
       this.openAiApiKey,
       this.anthropicApiKey,
+      { 
+        getMessageHistory: this.getMessageHistory,
+        personalityPrompt: config.personalityPrompt
+      },
     );
   }
 

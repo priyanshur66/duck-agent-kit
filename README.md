@@ -27,7 +27,7 @@ import { DuckAgent } from 'duck-agent-kit';
 const agent = new DuckAgent({
   privateKey: 'your-private-key',
   rpcUrl: 'https://rpc.duckchain.org', // Duck mainnet or testnet RPC
-  model: 'gpt-5', // or 'claude-3-sonnet'
+  model: 'gpt-4', // or 'claude-3-sonnet'
   openAiApiKey: 'your-openai-api-key', // Required for OpenAI models
   anthropicApiKey: 'your-anthropic-api-key', // Required for Anthropic models
   personalityPrompt: 'You are a helpful assistant for Duck blockchain operations...' // Optional: custom agent personality
@@ -194,20 +194,7 @@ OPENAI_API_KEY=your-openai-api-key
 ANTHROPIC_API_KEY=your-anthropic-api-key
 ```
 
-## Network Configuration
 
-### Mainnet
-```
-RPC URL: https://rpc.duckchain.org
-Chain ID: 202105
-
-```
-
-### Testnet (Duck Testnet)
-```
-RPC URL: https://testnet-rpc.duckchain.org/
-Chain ID: 77772
-```
 
 ## Examples
 
